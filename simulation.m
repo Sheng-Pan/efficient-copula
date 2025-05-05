@@ -209,14 +209,14 @@ N1 = 10; kstep = zeros(N1,4); kstep2 = zeros(N1,4);
 ple = zeros(N1,4); ose1 = zeros(N1,4);
 b1 = zeros(N0,1); b2 = zeros(N0,1); b3 = zeros(N0,1);
 para = linspace(-0.9,0.9,N1);
-nu = 5; N = 50;
+nu = 1; N = 50;
 for j = 1:N1
     alpha = para(j);
     z0 = 't';
     LB(j) = Information_matrix(z0,alpha,nu);
 end
 
-for j = 9:N1
+for j = 1:N1
     alpha = para(j);
     z0 = 't';
 parfor k = 1:N0
@@ -242,35 +242,18 @@ parfor k = 1:N0
     onestep = OSEt(1,Rho_initial,5,R1,R2,20);
     b1(k) = onestep;
     b2(k) = Rho_initial;
-    b3(k) = OSEt(10,Rho_initial,5,R1,R2,20);
 end
 kstep(j,1) = std(b1);
 kstep(j,2) = mean((b1-alpha).*(b1-alpha));
 kstep(j,3) = quantile(b1,0.5);
 kstep(j,4) = mean(b1-alpha);
-kstep2(j,1) = std(b3);
-kstep2(j,2) = mean((b3-alpha).*(b3-alpha));
-kstep2(j,3) = quantile(b3,0.5);
-kstep2(j,4) = mean(b3-alpha);
 ple(j,1) = std(b2);
 ple(j,2) = mean((b2-alpha).*(b2-alpha));
 ple(j,3) = quantile(b2,0.5);
 ple(j,4) = mean(b2-alpha);
 end
 
-% save('kstep_t.mat', 'kstep'); 
-% save('kstep2_t.mat', 'kstep2'); 
-% save('plm_t.mat', 'ple'); 
-save('kstep_t_n100.mat', 'kstep'); 
-save('kstep2_t_n100.mat', 'kstep2'); 
-save('plm_t.mat_n100', 'ple'); 
-% Plotting
-kstep = load('kstep_t.mat');
-kstep = kstep.kstep;
-kstep2 = load('kstep2_t.mat');
-kstep2 = kstep2.kstep2;
-ple = load('plm_t.mat');
-ple = ple.ple;
+
 v = 1;
 % Clear figure window and set global properties
 figure;
@@ -283,8 +266,6 @@ p2 = plot(para, ple(:,v), 'r--s', 'LineWidth', 2, 'MarkerSize', 6, ...
 p1 = plot(para, kstep(:,v), 'b-o', 'LineWidth', 2, 'MarkerSize', 6, ...
           'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'k', 'DisplayName', 'K=1');
       
-p3 = plot(para, kstep2(:,v), 'm-.^', 'LineWidth', 2, 'MarkerSize', 6, ...
-          'MarkerFaceColor', 'm', 'MarkerEdgeColor', 'k', 'DisplayName', 'K=2');
       
 p4 = plot(para, power(N*LB,-1/2), 'k:d', 'LineWidth', 2, 'MarkerSize', 6, ...
           'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'k', 'DisplayName', 'SEB');
